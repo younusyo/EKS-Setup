@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         TF_IN_AUTOMATION = 'true'
+        PATH = "${WORKSPACE}/bin:${env.PATH}"
     }
 
     stages {
@@ -15,13 +16,17 @@ pipeline {
         stage('Setup Terraform & Tools') {
             steps {
                 sh '''
-                    # Install Terraform
-                    curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-                    echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-                    sudo apt-get update && sudo apt-get install -y terraform
+                    mkdir -p bin
 
-                    # Install tflint
-                    curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+                    # Install Terraform
+                    curl -fsSL -o terraform.zip https://releases.hashicorp.com/terraform/1.9.8/terraform_1.9.8_linux_amd64.zip
+                    unzip -o terraform.zip -d bin
+                    chmod +x bin/terraform
+                    ./bin/terraform version
+
+                    # Install TFLint
+                    curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash -s -- -b bin
+                    ./bin/tflint --version
                 '''
             }
         }
