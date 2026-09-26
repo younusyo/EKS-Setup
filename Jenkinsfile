@@ -18,13 +18,13 @@ pipeline {
                 sh '''
                     mkdir -p bin
 
-                    # Install Terraform
+                    # ----- Install Terraform (without unzip) -----
                     curl -fsSL -o terraform.zip https://releases.hashicorp.com/terraform/1.9.8/terraform_1.9.8_linux_amd64.zip
-                    unzip -o terraform.zip -d bin
+                    python3 -c "import zipfile; zipfile.ZipFile('terraform.zip').extractall('bin')"
                     chmod +x bin/terraform
                     ./bin/terraform version
 
-                    # Install TFLint
+                    # ----- Install TFLint -----
                     curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash -s -- -b bin
                     ./bin/tflint --version
                 '''
